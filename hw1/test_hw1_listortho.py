@@ -228,7 +228,7 @@ def do_test_insert_from_file(words, tmp_path):
     filename.write_text("\n".join(words))
 
     lo = ListOrthographer()
-    lo.insert_from_file(filename)
+    lo.insert_from_file(str(filename))
 
     lowercase_words = filter(all_lower, words)
     assert sorted(list(set(lowercase_words))) == sorted(lo.words)
