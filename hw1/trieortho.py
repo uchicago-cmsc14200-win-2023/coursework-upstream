@@ -4,7 +4,7 @@ CMSC 14200: trie-based spell-checker and tab-completer Distribution
 Adam Shaw
 Winter 2023
 
-YOUR NAME HERE
+Boris Fosso
 """
 
 class Trie:
@@ -34,7 +34,21 @@ class Trie:
 
         Returns: (does not return a value)
         '''
-        raise NotImplementedError("todo: Trie.insert")
+        if(word[0]!=self.root):
+          return
+        
+        if len(word)==1:
+          self.final = True
+          return
+
+        for c in self.children.values():
+          if c.root==word[1]:
+            c.insert(word[1:])
+            return
+
+        newTrie = Trie(word[1])
+        newTrie.insert(word[1:])
+        self.children[len(self.children)] = newTrie
 
     def contains(self, word):
         '''
@@ -45,7 +59,13 @@ class Trie:
 
         Returns: boolean
         '''
-        raise NotImplementedError("todo: Trie.contains")
+        if len(word)==1:
+          return self.final
+        for c in self.children.values():
+          if word[1]==c.root:
+            return c.contains(word[1:])
+        return False
+
 
     def all_words(self):
         '''
@@ -57,7 +77,32 @@ class Trie:
 
         Returns: list[str]
         '''
-        raise NotImplementedError("todo: Trie.all_words")
+
+        t = self
+        lstoTrie = []
+        lstoBase = []
+        final = []
+
+        if self.final:
+          final.append(self.root)
+
+        for c in self.children.values():
+          if c.final:
+            final.append(self.root+c.root)
+          if len(c.children)>0:
+            lstoTrie.append(c)
+            lstoBase.append(self.root+c.root)
+        
+        while(len(lstoTrie) > 0):
+          c = lstoTrie.pop()
+          base = lstoBase.pop()
+          for cc in c.children.values():
+            if(cc.final):
+              final.append(base+cc.root)
+            if len(cc.children)>0:
+              lstoTrie.append(cc)
+              lstoBase.append(base+cc.root)
+        return final
 
     def num_words(self):
         '''
@@ -68,7 +113,13 @@ class Trie:
 
         Returns: int
         '''
-        raise NotImplementedError("todo: Trie.num_words")
+
+        count = 0
+        if self.final:
+          count = count + 1
+        for c in self.children.values():
+          count = count + c.num_words()
+        return count
 
     def completions(self, prefix):
         '''
@@ -80,7 +131,7 @@ class Trie:
 
         Returns: list[str]
         '''
-        raise NotImplementedError("todo: Trie.completions")
+        return self._compl(prefix, "")
 
     def _compl(self, prefix, acc):
         '''
@@ -95,7 +146,23 @@ class Trie:
 
         Returns: list[str]
         '''
-        raise NotImplementedError("todo: Trie.completions")
+
+        if(self.root!=prefix[0] and len(acc)==0):
+          return []
+
+        if len(prefix)==1:
+          lst = self.all_words()
+          final = []
+          for i in lst:
+            final.append(acc+i)
+          return final
+
+        for i in range(0, len(self.children)):
+          c = self.children[i]
+          print(c.root)
+          if c.root==prefix[1]:
+            return c._compl(prefix[1:], acc+self.root)
+        return []
 
     def num_completions(self, prefix):
         '''
@@ -106,7 +173,12 @@ class Trie:
 
         Returns: int
         '''
-        raise NotImplementedError("todo: Trie.num_completions")
+        if len(prefix)==1:
+          return self.num_words()
+        for i in range(0, len(self.children)):
+          c = self.children[i]
+          if(c.root==prefix[1]):
+            return c.num_completions(prefix[1:])
 
 
 class TrieOrthographer:
@@ -137,7 +209,10 @@ class TrieOrthographer:
 
         Returns: (does not return a value)
         '''
-        raise NotImplementedError("todo: TrieOrthographer.insert")
+        for c in word:
+          if c not in "qwertyuiopasdfghjklzxcvbnm":
+            return
+        self.tries[word[0]].insert(word)
 
     def insert_from_file(self, filename):
         '''
@@ -148,7 +223,17 @@ class TrieOrthographer:
 
         Returns: (does not return a value)
         '''
-        raise NotImplementedError("todo: TrieOrthographer.insert_from_file")
+        try:
+          file = open(filename, "r")
+        except:
+          print("File Not Found")
+          return
+
+        for ln in file.readlines():
+          word = ln.strip()
+          self.insert(word)
+        
+        file.close()
 
     def contains(self, word):
         '''
@@ -159,7 +244,7 @@ class TrieOrthographer:
 
         Returns: boolean
         '''
-        raise NotImplementedError("todo: TrieOrthographer.contains")
+        return self.tries[word[0]].contains(word)
 
     def completions(self, prefix):
         '''
@@ -171,7 +256,7 @@ class TrieOrthographer:
 
         Returns: list[str]
         '''
-        raise NotImplementedError("todo: TrieOrthographer.completions")
+        return self.tries[prefix[0]].completions(prefix)
 
     def num_completions(self, prefix):
         '''
@@ -182,7 +267,7 @@ class TrieOrthographer:
 
         Returns: int
         '''
-        raise NotImplementedError("todo: TrieOrthographer.num_completions")
+        return self.tries[prefix[0]].num_completions(prefix)
 
     def all_words(self):
         '''
@@ -194,7 +279,11 @@ class TrieOrthographer:
 
         Returns: list[str]
         '''
-        raise NotImplementedError("todo: TrieOrthographer.all_words")
+        all = []
+        for tr in self.tries.values():
+          for word in tr.all_words():
+            all.append(word)
+        return all
 
     def num_words(self):
         '''
@@ -205,4 +294,7 @@ class TrieOrthographer:
 
         Returns: int
         '''
-        raise NotImplementedError("todo: TrieOrthographer.num_words")
+        num = 0
+        for tr in self.tries.values():
+          num = num + tr.num_words()
+        return num

@@ -4,7 +4,7 @@ CMSC 14200: list-based spell-checker and tab-completer Distribution
 Adam Shaw
 Winter 2023
 
-YOUR NAME HERE
+Boris Fosso
 """
 
 
@@ -34,7 +34,14 @@ class ListOrthographer:
 
         Returns: (does not return a value)
         '''
-        raise NotImplementedError("todo: ListOrthographer.insert")
+        for c in word:
+          if c not in "qwertyuiopasdfghjklzxcvbnm":
+            return
+        for wrd in self.words:
+          if wrd == word:
+            return
+        self.words.append(word)
+          
 
     def insert_from_file(self, filename):
         '''
@@ -45,7 +52,15 @@ class ListOrthographer:
 
         Returns: (does not return a value)
         '''
-        raise NotImplementedError("todo: ListOrthographer.insert_from_file")
+        try:
+          file = open(filename, "r")
+        except:
+          print("File Not Found")
+          return
+        
+        [self.insert(ln.strip()) for ln in file.readlines()]
+        
+        file.close()
 
     def contains(self, word):
         '''
@@ -56,7 +71,11 @@ class ListOrthographer:
 
         Returns: boolean
         '''
-        raise NotImplementedError("todo: ListOrthographer.contains")
+        for wrd in self.words:
+          if wrd==word:
+            return True
+        
+        return False
 
     def completions(self, prefix):
         '''
@@ -68,7 +87,15 @@ class ListOrthographer:
 
         Returns: list[str]
         '''
-        raise NotImplementedError("todo: ListOrthographer.completions")
+        lst = []
+
+        for wrd in self.words:
+          if len(wrd) < len(prefix):
+            pass
+          elif wrd[0:len(prefix)] == prefix:
+            lst.append(wrd)
+
+        return lst
 
     def num_completions(self, prefix):
         '''
@@ -79,7 +106,7 @@ class ListOrthographer:
 
         Returns: int
         '''
-        raise NotImplementedError("todo: ListOrthographer.num_completions")
+        return len(self.completions(prefix))
 
     def all_words(self):
         '''
@@ -91,7 +118,7 @@ class ListOrthographer:
 
         Returns: list[str]
         '''
-        raise NotImplementedError("todo: ListOrthographer.all_words")
+        return self.words
 
     def num_words(self):
         '''
@@ -102,4 +129,5 @@ class ListOrthographer:
 
         Returns: int
         '''
-        raise NotImplementedError("todo: ListOrthographer.num_words")
+        return len(self.words)
+
