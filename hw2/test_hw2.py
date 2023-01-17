@@ -252,24 +252,31 @@ def do_test_construct(height, width, seed):
             if north == "None":
                 assert(actual_cell.north is None)
             else:
+                assert(actual_cell.north is not None)
                 n_row, n_col = north.split("-")
                 assert(actual_cell.north.row == int(n_row))
                 assert(actual_cell.north.column == int(n_col))
+
             if east == "None":
                 assert(actual_cell.east is None)
             else:
+                assert(actual_cell.east is not None)
                 e_row, e_col = east.split("-")
                 assert(actual_cell.east.row == int(e_row))
                 assert(actual_cell.east.column == int(e_col))
+
             if south == "None":
                 assert(actual_cell.south is None)
             else:
+                assert(actual_cell.south is not None)
                 s_row, s_col = south.split("-")
                 assert(actual_cell.south.row == int(s_row))
                 assert(actual_cell.south.column == int(s_col))
+
             if west == "None":
                 assert(actual_cell.west is None)
             else:
+                assert(actual_cell.west is not None)
                 w_row, w_col = west.split("-")
                 assert(actual_cell.west.row == int(w_row))
                 assert(actual_cell.west.column == int(w_col))
@@ -299,7 +306,7 @@ def do_test_trail(height, width, seed, interpose=""):
 def do_test_str(height, width, seed):
     m = Maze(height, width, seed)
     filename = "tests/maze-{}-{}-{}.str".format(height, width, seed)
-    with open(filename) as f:
+    with open(filename, encoding="utf-8") as f:
         expected = f.read()
     assert(str(m) == expected)
 
@@ -314,7 +321,7 @@ def do_test_solve(height, width, seed):
 
 def do_test_to_string(actual, filename):
     filename = "tests/" + filename
-    with open(filename) as f:
+    with open(filename, encoding="utf-8") as f:
         expected = f.read()
     assert(actual == expected)
 
