@@ -1,5 +1,8 @@
 import math
 
+import pandas as pd
+
+
 def compare_dataframes(actual, expected):
     '''
     Compare two dataframes.  Inputs can contain a mix of types,
@@ -18,6 +21,11 @@ def compare_dataframes(actual, expected):
 
     if expected is None:
         return (False, "Actual is not None, when expected is None\n")
+
+    if not isinstance(actual, pd.DataFrame):
+        return (False, f"Actual is not a dataframe (got {type(actual)} instead)")
+
+    assert isinstance(expected, pd.DataFrame), f"Test data contains non-dataframe ({type(expected)})"
 
     if actual.equals(expected):
         return (True, None)
