@@ -27,9 +27,20 @@ def compare_dataframes(actual, expected):
 
     assert isinstance(expected, pd.DataFrame), f"Test data contains non-dataframe ({type(expected)})"
 
+    # Check if they're fully equal
     if actual.equals(expected):
         return (True, None)
 
+    # If not, compare just the values
+    try:
+        cmp = actual.compare(expected)
+        if len(cmp) == 0:
+            return (True, None)
+    except ValueError:
+        pass
+
+    # At this point, there must be a discrepancy in the values.
+    # We need to check column by column and row by row to find it.
     actual_row_names = actual.index.tolist()
     actual_col_names = actual.columns.tolist()
 
@@ -56,7 +67,9 @@ def compare_dataframes(actual, expected):
                    (math.isnan(a) and not math.isnan(e)) or \
                    (not math.isnan(a) and math.isnan(e)):
                     return False, msg.format(col_name, row_name, e, a)
-            elif a != e:
+            elif pd.isnull(e) and not pd.isnull(a):
+                return False, msg.format(col_name, row_name, e, a)
+            elif not pd.isnull(e) and a != e:
                 return False, msg.format(col_name, row_name, e, a)
 
     return True, None
